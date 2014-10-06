@@ -284,7 +284,7 @@ void resetHash() { if (hash != 0) memset(hash,0,4*HASHSIZE); }
 
 int hashPhase = 0;
 
-inline long hashFunction(node b, row r) {
+static inline long hashFunction(node b, row r) {
 	long h = r;
 	int i;
 	for (i = 0; i < nRowsInState; i++) {
@@ -297,7 +297,7 @@ inline long hashFunction(node b, row r) {
 }
 
 /* test if q+r is same as p */
-inline int same(node p, node q, row r) {
+static inline int same(node p, node q, row r) {
 	int i;
 	for (i = 0; i < nRowsInState; i++) {
 		if (p >= QSIZE || q >= QSIZE || EMPTY(p) || EMPTY(q)) return 0;	/* sanity check */
@@ -311,7 +311,7 @@ inline int same(node p, node q, row r) {
 
 /* test if weve seen this child before */
 void success(node);
-inline int isVisited(node b, row r) {
+static inline int isVisited(node b, row r) {
 	if (same(0,b,r)) {
 		if (b != 0 && period == 1) success(b); /* photon never gets to usual terminal call */
 		return 1;
@@ -326,7 +326,7 @@ inline int isVisited(node b, row r) {
 }
 
 /* set node (NOT child) to be visited */
-inline void setVisited(node b) {
+static inline void setVisited(node b) {
 	if (hash != 0) hash[ hashFunction(PARENT(b),ROW(b)) ] = b;
 }
 
@@ -406,7 +406,7 @@ int peekPhase(node i) {
 
 /* Test queue status */
 
-inline int qIsEmpty() {
+static inline int qIsEmpty() {
 	while (qHead < qTail && EMPTY(qHead)) qHead++;
 	return (qTail == qHead);
 }
@@ -419,7 +419,7 @@ void qFull() {
 	}
 }
 
-inline void enqueue(node b, row r) {
+static inline void enqueue(node b, row r) {
 	int i = qTail++;
 	if (i >= QSIZE) qFull();
 	else if (FIRSTBASE(i)) {
@@ -441,7 +441,7 @@ inline void enqueue(node b, row r) {
 	    fprintf(stderr, "Create node %d: %lo\n", i, (long unsigned int)r);
 }
 
-inline node dequeue() { 
+static inline node dequeue() {
 	while (qHead < qTail && EMPTY(qHead)) qHead++;
 	if (qHead >= nextRephase) {
 		queuePhase = (queuePhase+1)%period;
@@ -455,14 +455,14 @@ inline node dequeue() {
 	return qHead++;
 }
 
-inline void pop() {
+static inline void pop() {
 	qTail--;
 	while (qTail > qHead && EMPTY(qTail-1)) qTail--;
 }
 
 void resetQ() { qHead = qTail = 0; }
 
-inline int qTop() { return qTail - 1; }
+static inline int qTop() { return qTail - 1; }
 
 
 /* ================================= */
